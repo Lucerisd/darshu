@@ -1,0 +1,21 @@
+{
+  "name": "Darshita Gupta — Graphic Designer",
+  "short_name": "Darshita Gupta",
+  "description": "Portfolio of Darshita Gupta, Graphic Designer based in Uttar Pradesh, India. Branding, visual identity, packaging, and commercial graphics.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff9f1",
+  "theme_color": "#fff9f1",
+  "icons": [
+    {
+      "src": "/assets/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/favicon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

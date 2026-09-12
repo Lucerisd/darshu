@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+
+# Local Netlify state
+.netlify/
+
+# Legacy backup
+zainabkabira.com/
+
+# System files
+.DS_Store
+Thumbs.db
