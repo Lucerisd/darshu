@@ -12,7 +12,7 @@ A bespoke, immersive portfolio website for **Darshita Gupta**, Graphic Designer 
 - **Featured Projects**: High-impact 16:9 3D motion design spotlight for Stanley 1913, accompanied by tailored graphic series (Aura Botanica, Artisan Pizza, May 25).
 - **About Experience & Fun Facts**: Interactive polaroid stacks with physics reset, professional design journey accordion, Cafe 2025 memories, custom weekend todo list, editorial typography blog, motion design lab, and Pashmina music card.
 - **Interactive 3D Playground**: Rotating 3D coverflow carousel showcasing commercial product spots, kinetic motion graphics, editorial collages, and character illustrations with fullscreen media lightbox.
-- **Full Case Studies**: Hatcha, Fireflut, Existence, and Jumpable with perspective phone plates, dual-axis sliders, and night mode plates.
+- **Media Lightboxes**: High-fidelity fullscreen modal spotlights for graphic identity assets, editorial collages, and 3D commercial motion spots.
 
 ## 🛠 Tech Stack
 
