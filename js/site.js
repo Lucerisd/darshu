@@ -37,7 +37,7 @@ const NAV_HTML = `
       </div>
       <span class="avail-dot" aria-hidden="true"></span>
       <div class="nav-links" id="nav-links-group">
-        <a href="#work" class="nav-link">Work</a>
+        <a href="/#work" class="nav-link" data-nav-work>Work</a>
         <a href="/about" class="nav-link">About</a>
         <a href="/playground" class="nav-link">Playground</a>
         <a href="/#contact" class="nav-cta" data-contact-open>
@@ -84,7 +84,7 @@ const MENU_HTML = `
     <button class="menu-close" id="menu-close" aria-label="Close menu"></button>
     <nav>
       <ul class="menu-links">
-        <li><a href="#work" class="menu-link"><span class="num">01</span><span class="word">Work</span></a></li>
+        <li><a href="/#work" class="menu-link" data-nav-work><span class="num">01</span><span class="word">Work</span></a></li>
         <li><a href="/about" class="menu-link"><span class="num">02</span><span class="word">About</span></a></li>
         <li><a href="/playground" class="menu-link"><span class="num">03</span><span class="word">Playground</span></a></li>
       </ul>

@@ -181,9 +181,6 @@
             if ('scrollRestoration' in history) {
                 history.scrollRestoration = 'manual';
             }
-            if (location.hash === '#work') {
-                history.replaceState(null, '', location.pathname + location.search);
-            }
             var p = window.route.H2P[location.hash];
             if (p) history.replaceState(null, '', p);
         })();
@@ -5215,8 +5212,7 @@
     <script>
         document.documentElement.classList.add('pl-lock');
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-        if (location.hash === '#work' || !location.hash) {
-            if (location.hash === '#work') history.replaceState(null, '', location.pathname + location.search);
+        if (!location.hash) {
             window.scrollTo(0, 0);
         }
     </script>
@@ -5232,7 +5228,7 @@
             var pl = document.getElementById('page-loader');
             if (!pl) return;
             function forceHide() {
-                if (location.hash === '#work' || !location.hash) {
+                if (!location.hash) {
                     window.scrollTo(0, 0);
                 }
                 if (window.pageLoader && window.pageLoader.hide) {
@@ -5832,16 +5828,12 @@
 
             // Scroll the landing to an in-page anchor
             function scrollToHashTarget() {
-                if (!location.hash || location.hash === '#work') return;
+                if (!location.hash) return;
                 const target = document.querySelector(location.hash);
                 if (!target) return;
                 const nav = document.getElementById('nav');
                 const doScroll = () => {
                     const navH = nav ? nav.getBoundingClientRect().height : 80;
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'instant'
-                    });
                     const docTop = target.getBoundingClientRect().top + window.scrollY;
                     window.scrollTo({
                         top: Math.max(0, docTop - navH - 8),
@@ -5849,7 +5841,7 @@
                     });
                 };
                 doScroll();
-                [80, 260].forEach(t => setTimeout(doScroll, t));
+                [80, 260, 600].forEach(t => setTimeout(doScroll, t));
             }
 
             function applyAboutRoute() {
@@ -6080,45 +6072,68 @@
                 }
             }
 
+            function scrollToWorkElement(behavior = 'smooth') {
+                const workSec = document.getElementById('work');
+                if (!workSec) return;
+                const nav = document.getElementById('nav');
+                const navH = nav ? nav.getBoundingClientRect().height : 80;
+                const docTop = workSec.getBoundingClientRect().top + window.scrollY;
+                window.scrollTo({
+                    top: Math.max(0, docTop - navH - 8),
+                    behavior: behavior
+                });
+            }
+
+            function goWork(e) {
+                if (e && e.preventDefault) e.preventDefault();
+                const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                const leavingSubpage = routeBucket(route.token()) !== 'home';
+
+                const menuOverlay = document.getElementById('menu-overlay');
+                if (menuOverlay && menuOverlay.classList.contains('open')) {
+                    const burger = document.getElementById('nav-burger');
+                    if (burger) burger.click();
+                }
+
+                history.replaceState(null, '', '/#work');
+                prevHash = '';
+
+                if (!leavingSubpage) {
+                    scrollToWorkElement(reduced ? 'instant' : 'smooth');
+                    return;
+                }
+
+                if (curtain && !reduced && !inTransition) {
+                    runCurtain('home');
+                    setTimeout(() => scrollToWorkElement('instant'), T_CLOSE + T_HOLD + 60);
+                    setTimeout(() => scrollToWorkElement(reduced ? 'instant' : 'smooth'), T_CLOSE + T_HOLD + T_OPEN + 60);
+                } else {
+                    applyAboutRoute();
+                    setTimeout(() => scrollToWorkElement(reduced ? 'instant' : 'smooth'), 60);
+                }
+            }
+            window.goWork = goWork;
+
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest && e.target.closest('a[href="#work"], a[href="/#work"], [data-nav-work]');
+                if (link && !link.classList.contains('nav-avatar') && !link.classList.contains('nav-back')) {
+                    goWork(e);
+                }
+            });
+
             function wireNav() {
-                // the parse-time applyAboutRoute() below already set the route; the nav
-                // has only just rendered, so re-sync ONLY the nav-dependent bits instead
-                // of re-running the whole route swap (which double-fired the synthetic
-                // resize remeasure and a second batch of contrast timers at every load)
                 const isAbout = route.token() === '#about';
                 const isPlayground = route.token() === '#playground';
                 document.querySelectorAll('.nav-link, .menu-link').forEach(l => {
                     const href = l.getAttribute('href') || '';
                     l.classList.toggle('active', (isAbout && (href.endsWith('#about') || href.endsWith('/about'))) || (isPlayground && (href.endsWith('#playground') || href.endsWith('/playground'))));
                 });
-                [0, 320].forEach(t => setTimeout(() => window.updateNavContrast ?.(), t));
+                [0, 320].forEach(t => setTimeout(() => window.updateNavContrast?.(), t));
                 const avatar = document.querySelector('.nav-avatar');
                 if (avatar && !avatar.dataset.homeWired) {
                     avatar.dataset.homeWired = '1';
-                    avatar.addEventListener('click', goHome); // native <a> handles focus/Enter/role
+                    avatar.addEventListener('click', goHome);
                 }
-                document.querySelectorAll('a[href="#work"], a[href="/#work"]').forEach(link => {
-                    if (link.classList.contains('nav-avatar') || link.classList.contains('nav-back')) return;
-                    if (!link.dataset.workWired) {
-                        link.dataset.workWired = '1';
-                        link.addEventListener('click', (e) => {
-                            const isHome = routeBucket(route.token()) === 'home';
-                            if (isHome) {
-                                e.preventDefault();
-                                const workSec = document.getElementById('work');
-                                if (workSec) {
-                                    const nav = document.getElementById('nav');
-                                    const navH = nav ? nav.getBoundingClientRect().height : 80;
-                                    const docTop = workSec.getBoundingClientRect().top + window.scrollY;
-                                    window.scrollTo({
-                                        top: Math.max(0, docTop - navH - 8),
-                                        behavior: 'smooth'
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });
             }
             // run once the shared nav (js/site.js, deferred) has rendered
             document.addEventListener('DOMContentLoaded', wireNav);
