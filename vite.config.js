@@ -14,42 +14,38 @@ export default defineConfig({
   publicDir: false,
   plugins: [
     {
-      name: 'copy-seo-files',
+      name: 'copy-all-assets-and-chrome',
       closeBundle() {
         const distDir = path.resolve(__dirname, 'dist');
-        if (fs.existsSync(distDir)) {
-          const files = ['robots.txt', 'sitemap.xml', 'site.webmanifest', 'favicon.ico'];
-          files.forEach(f => {
-            const src = path.resolve(__dirname, f);
-            if (fs.existsSync(src)) {
-              fs.copyFileSync(src, path.resolve(distDir, f));
-            }
-          });
-          const ogCardSrc = path.resolve(__dirname, 'assets', 'og-card.jpg');
-          const ogCardDist = path.resolve(distDir, 'assets', 'og-card.jpg');
-          if (fs.existsSync(ogCardSrc) && fs.existsSync(path.resolve(distDir, 'assets'))) {
-            fs.copyFileSync(ogCardSrc, ogCardDist);
-          }
-          ['favicon-32.png', 'favicon-180.png'].forEach(fav => {
-            const favSrc = path.resolve(__dirname, 'assets', fav);
-            const favDist = path.resolve(distDir, 'assets', fav);
-            if (fs.existsSync(favSrc) && fs.existsSync(path.resolve(distDir, 'assets'))) {
-              fs.copyFileSync(favSrc, favDist);
-            }
-          });
+        if (!fs.existsSync(distDir)) return;
 
-          // Recursively copy dynamic asset folders used by JS (playground, projects)
-          const playgroundSrc = path.resolve(__dirname, 'assets', 'playground');
-          const playgroundDist = path.resolve(distDir, 'assets', 'playground');
-          if (fs.existsSync(playgroundSrc)) {
-            fs.cpSync(playgroundSrc, playgroundDist, { recursive: true });
+        // 1. Root SEO, configuration, and chrome files
+        const rootFiles = ['robots.txt', 'sitemap.xml', 'site.webmanifest', 'favicon.ico', 'vercel.json'];
+        rootFiles.forEach(f => {
+          const src = path.resolve(__dirname, f);
+          if (fs.existsSync(src)) {
+            fs.copyFileSync(src, path.resolve(distDir, f));
           }
+        });
 
-          const projectsSrc = path.resolve(__dirname, 'assets', 'projects');
-          const projectsDist = path.resolve(distDir, 'assets', 'projects');
-          if (fs.existsSync(projectsSrc)) {
-            fs.cpSync(projectsSrc, projectsDist, { recursive: true });
-          }
+        // 2. Copy css/ and js/ folders completely into dist/
+        const cssSrc = path.resolve(__dirname, 'css');
+        const cssDist = path.resolve(distDir, 'css');
+        if (fs.existsSync(cssSrc)) {
+          fs.cpSync(cssSrc, cssDist, { recursive: true });
+        }
+
+        const jsSrc = path.resolve(__dirname, 'js');
+        const jsDist = path.resolve(distDir, 'js');
+        if (fs.existsSync(jsSrc)) {
+          fs.cpSync(jsSrc, jsDist, { recursive: true });
+        }
+
+        // 3. Copy the entire assets/ folder into dist/assets/
+        const assetsSrc = path.resolve(__dirname, 'assets');
+        const assetsDist = path.resolve(distDir, 'assets');
+        if (fs.existsSync(assetsSrc)) {
+          fs.cpSync(assetsSrc, assetsDist, { recursive: true });
         }
       }
     }
