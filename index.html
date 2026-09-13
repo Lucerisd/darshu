@@ -8091,7 +8091,7 @@
                     poster: '/assets/playground/lune-photo.webp',
                     type: 'video',
                     title: 'Lune Coffee',
-                    tool: 'Branding & 3D Motion · 2024',
+                    tool: 'Branding & 3D Motion · 2026',
                     desc: 'A rich sensory coffee brand exploration celebrating artisanal roasted beans, dynamic latte splashes, and gold foil accents.'
                 },
                 {
@@ -8107,7 +8107,7 @@
                     poster: '/assets/playground/salicylic-acid-photo.webp',
                     type: 'video',
                     title: 'The Derma Co — Salicylic Acid',
-                    tool: 'Product Visualization · 2024',
+                    tool: 'Product Visualization · 2026',
                     desc: 'Minimalist commercial spot showcasing active skincare clarity, precision dropper dynamics, and contemporary purple brand aesthetics.'
                 },
                 {
@@ -8115,28 +8115,28 @@
                     thumb: '/assets/playground/may25-close.webp',
                     type: 'img',
                     title: 'May 25 — White Roses',
-                    tool: 'Editorial Design & Collage · 2024',
+                    tool: 'Editorial Design & Collage · 2026',
                     desc: 'Tactile editorial calendar collage pairing spiraled binding, delicate white rose bouquets, floating monochrome butterflies, and layered paper textures.'
                 },
                 {
                     src: '/assets/playground/elphy.webp',
                     type: 'img',
                     title: 'Elphy — Character Concept',
-                    tool: 'Digital Illustration · 2024',
+                    tool: 'Digital Illustration · 2026',
                     desc: 'Whimsical character design of an endearing, scholarly baby elephant in a tailored navy three-piece suit with round horn-rimmed spectacles.'
                 },
                 {
                     src: '/assets/playground/aura-botanica.webp',
                     type: 'img',
                     title: 'Aura Botanica — Radiance Serum',
-                    tool: 'Brand Identity & Packaging · 2024',
+                    tool: 'Brand Identity & Packaging · 2026',
                     desc: 'Organic botanical skincare identity combining soothing sage geometry, clean sans typography, and frosted dropper bottle mockups.'
                 },
                 {
                     src: '/assets/playground/artisan-pizza.webp',
                     type: 'img',
                     title: 'Artisan Pizza — Brand Poster',
-                    tool: 'Graphic Design & Print · 2024',
+                    tool: 'Graphic Design & Print · 2026',
                     desc: 'Bold Italian culinary identity featuring appetizing high-contrast layouts, rich tomato hues, and contemporary typography.'
                 }
             ];
@@ -8298,13 +8298,13 @@
                 if (e.key === 'ArrowLeft') prev();
             });
 
-            /* ── drag / swipe — axis-locked. Horizontal rotates the ring; a plain
-               tap still opens the lightbox (no pointer capture). ── */
+            /* ── drag / swipe — calibrated gesture threshold (reduces hyper-sensitivity) ── */
             var dragging = false,
                 startX = 0,
                 startY = 0,
                 axis = null,
-                dragMoved = false;
+                dragMoved = false,
+                dragTriggered = false;
             stage.addEventListener('pointerdown', function(e) {
                 if (e.target.closest('.pgf-arrow')) return; // let arrow buttons click
                 dragging = true;
@@ -8312,49 +8312,65 @@
                 startY = e.clientY;
                 axis = null;
                 dragMoved = false;
+                dragTriggered = false;
             });
             stage.addEventListener('pointermove', function(e) {
                 if (!dragging) return;
                 var dx = e.clientX - startX,
                     dy = e.clientY - startY;
                 if (!axis) {
-                    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+                    if (Math.abs(dx) < 14 && Math.abs(dy) < 14) return;
                     axis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
                 }
-                if (axis === 'x' && Math.abs(dx) > 50) {
-                    dragMoved = true;
-                    if (dx < 0) next();
-                    else prev();
-                    startX = e.clientX;
+                if (axis === 'x') {
+                    if (Math.abs(dx) > 16) dragMoved = true;
+                    // Calibrated sensitivity: deliberate 95px swipe per card
+                    if (!dragTriggered && Math.abs(dx) >= 95) {
+                        dragTriggered = true;
+                        if (dx < 0) next();
+                        else prev();
+                    }
                 }
             });
 
             function endDrag() {
                 dragging = false;
                 axis = null;
+                dragTriggered = false;
                 setTimeout(function() {
                     dragMoved = false;
-                }, 50);
+                }, 80);
             }
             stage.addEventListener('pointerup', endDrag);
             stage.addEventListener('pointercancel', endDrag);
             stage.addEventListener('pointerleave', endDrag);
 
-            /* ── wheel over the stage → rotate (endless loop, page never scrolls) ── */
+            /* ── wheel over the stage → rotate (dampened delta accumulator) ── */
             var wheelLock = false;
+            var wheelAccum = 0;
+            var wheelClearTimer = null;
             stage.addEventListener('wheel', function(e) {
-                var dx = e.deltaX,
-                    dy = e.deltaY;
-                var dir = (Math.abs(dx) > Math.abs(dy)) ? (dx < 0 ? -1 : 1) : (dy < 0 ? -1 : 1);
-                if (dir === 0) return;
                 e.preventDefault();
                 if (wheelLock) return;
-                wheelLock = true;
-                if (dir > 0) next();
-                else prev();
-                setTimeout(function() {
-                    wheelLock = false;
-                }, 420);
+                var dx = e.deltaX,
+                    dy = e.deltaY;
+                var delta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+                wheelAccum += delta;
+                clearTimeout(wheelClearTimer);
+                wheelClearTimer = setTimeout(function() {
+                    wheelAccum = 0;
+                }, 180);
+
+                // Require deliberate accumulated wheel movement (85px)
+                if (Math.abs(wheelAccum) >= 85) {
+                    wheelLock = true;
+                    if (wheelAccum > 0) next();
+                    else prev();
+                    wheelAccum = 0;
+                    setTimeout(function() {
+                        wheelLock = false;
+                    }, 650); // Matches .pgf-card 0.7s transition
+                }
             }, {
                 passive: false
             });
