@@ -47,6 +47,13 @@ export default defineConfig({
         if (fs.existsSync(assetsSrc)) {
           fs.cpSync(assetsSrc, assetsDist, { recursive: true });
         }
+
+        // 4. Static subpage entry points for flawless routing on any CDN/host (Vercel/Netlify)
+        ['about', 'playground'].forEach(route => {
+          const routeDir = path.resolve(distDir, route);
+          if (!fs.existsSync(routeDir)) fs.mkdirSync(routeDir, { recursive: true });
+          fs.copyFileSync(path.resolve(distDir, 'index.html'), path.resolve(routeDir, 'index.html'));
+        });
       }
     }
   ]
