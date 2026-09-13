@@ -6,7 +6,10 @@ export default defineConfig({
   server: {
     port: 3000,
     open: false,
-    host: true
+    host: true,
+    watch: {
+      ignored: ['**/dist/**', '**/.git/**', '**/.vercel/**', '**/.netlify/**']
+    }
   },
   preview: {
     port: 3000
@@ -19,8 +22,15 @@ export default defineConfig({
         const distDir = path.resolve(__dirname, 'dist');
         if (!fs.existsSync(distDir)) return;
 
-        // 1. Root SEO, configuration, and chrome files
+        // 1. Root SEO, configuration, verification, and chrome files
         const rootFiles = ['robots.txt', 'sitemap.xml', 'site.webmanifest', 'favicon.ico', 'vercel.json'];
+        // Also include any google site verification html files
+        fs.readdirSync(__dirname).forEach(file => {
+          if (file.startsWith('google') && file.endsWith('.html')) {
+            rootFiles.push(file);
+          }
+        });
+
         rootFiles.forEach(f => {
           const src = path.resolve(__dirname, f);
           if (fs.existsSync(src)) {
