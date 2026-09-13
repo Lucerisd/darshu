@@ -2,24 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://darshu-portfolio.netlify.app/</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://darshitagupta.in/</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://darshu-portfolio.netlify.app/assets/og-card.jpg</image:loc>
+      <image:loc>https://darshitagupta.in/assets/og-card.jpg</image:loc>
       <image:title>Darshita Gupta — Graphic Designer Portfolio</image:title>
     </image:image>
   </url>
   <url>
-    <loc>https://darshu-portfolio.netlify.app/about</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://darshitagupta.in/about</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://darshu-portfolio.netlify.app/playground</loc>
-    <lastmod>2026-09-12</lastmod>
+    <loc>https://darshitagupta.in/playground</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

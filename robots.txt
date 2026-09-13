@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://darshu-portfolio.netlify.app/sitemap.xml
+Sitemap: https://darshitagupta.in/sitemap.xml

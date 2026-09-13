@@ -4,7 +4,7 @@ A bespoke, immersive portfolio website for **Darshita Gupta**, Graphic Designer 
 
 ## 🚀 Live Site
 
-- **Live URL**: [https://darshu-portfolio.netlify.app](https://darshu-portfolio.netlify.app)
+- **Live URL**: [https://darshitagupta.in](https://darshitagupta.in)
 
 ## ✨ Features
 
