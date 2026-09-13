@@ -1406,24 +1406,85 @@
             }
         }
 
-        /* ── Mobile / Touch devices: suppress sticky hover overlays, blurs & touch blocking ── */
+        /* ── Active / Revealed state for touch interaction ── */
+        .project-tile.is-active .tile-overlay {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+
+        .project-tile.is-active .tile-tag,
+        .project-tile.is-active .tile-cta {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        .project-tile.is-active {
+            box-shadow: inset 0 0 0 1px #323131 !important;
+        }
+
+        /* ── Mobile / Touch devices: clean, high-performance overlay without GPU blur freeze ── */
         @media (hover: none), (pointer: coarse), (max-width: 768px) {
             .tile-overlay {
-                display: none !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
+                display: flex !important;
+                opacity: 0;
+                pointer-events: none;
+                /* Avoid heavy Gaussian blur on mobile GPU while video decodes */
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                background: rgba(10, 12, 20, 0.92) !important;
+                padding: 24px 18px;
+                transition: opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             }
 
             .project-tile:hover {
-                box-shadow: none !important;
+                box-shadow: none;
             }
 
             .project-tile:hover .project-tile-media {
-                transform: none !important;
+                transform: none;
             }
 
             .project-tile[data-project-id="stanley"]:hover video.project-tile-media {
-                transform: none !important;
+                transform: none;
+            }
+
+            .tile-overlay-title {
+                color: #ffffff !important;
+                font-size: clamp(24px, 6vw, 32px);
+                letter-spacing: -0.8px;
+                margin-bottom: 6px;
+                text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+            }
+
+            .tile-graphic .tile-overlay-title {
+                font-size: clamp(20px, 5vw, 26px);
+            }
+
+            .tile-overlay-subtitle {
+                color: rgba(255, 255, 255, 0.9) !important;
+                font-size: clamp(13px, 3.4vw, 15px);
+                line-height: 1.38;
+                max-width: 320px;
+                text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+            }
+
+            .tile-tag {
+                font-size: 10.5px;
+                letter-spacing: 1.4px;
+                padding: 5px 14px;
+                margin-bottom: 12px;
+                background: rgba(255, 255, 255, 0.2) !important;
+                border: 1px solid rgba(255, 255, 255, 0.4) !important;
+                color: #ffffff !important;
+            }
+
+            .tile-cta {
+                font-size: 13.5px;
+                padding: 8px 22px;
+                margin-top: 16px;
+                background: rgba(255, 255, 255, 0.24) !important;
+                border: 1px solid rgba(255, 255, 255, 0.55) !important;
+                color: #ffffff !important;
             }
         }
 
@@ -8631,12 +8692,50 @@
                 }
             });
 
+            let activeTouchTile = null;
+
+            function clearActiveTouchTile() {
+                if (activeTouchTile) {
+                    activeTouchTile.classList.remove('is-active');
+                    activeTouchTile = null;
+                }
+            }
+
+            // Dismiss active hover text immediately when user scrolls
+            window.addEventListener('scroll', function() {
+                if (activeTouchTile) clearActiveTouchTile();
+            }, { passive: true });
+
+            // Dismiss active hover text if user taps outside the card
+            document.addEventListener('touchstart', function(e) {
+                if (activeTouchTile && !activeTouchTile.contains(e.target)) {
+                    clearActiveTouchTile();
+                }
+            }, { passive: true });
+
             document.querySelectorAll('[data-project-id]').forEach(function(tile) {
                 tile.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
                     const id = tile.getAttribute('data-project-id');
-                    openFullView(id);
+                    const isProjectTile = tile.classList.contains('project-tile');
+                    const isTouch = (window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth <= 768) && isProjectTile;
+
+                    if (isTouch) {
+                        // If this card is already active and showing hover text, or if user clicked CTA button, open modal
+                        if (tile === activeTouchTile || (e.target && e.target.closest && e.target.closest('.tile-cta'))) {
+                            clearActiveTouchTile();
+                            openFullView(id);
+                        } else {
+                            // First tap reveals the hover text
+                            clearActiveTouchTile();
+                            tile.classList.add('is-active');
+                            activeTouchTile = tile;
+                        }
+                    } else {
+                        // Desktop: click directly opens full-view modal
+                        openFullView(id);
+                    }
                 });
             });
         })();
