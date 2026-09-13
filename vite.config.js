@@ -51,11 +51,17 @@ export default defineConfig({
           fs.cpSync(jsSrc, jsDist, { recursive: true });
         }
 
-        // 3. Copy the entire assets/ folder into dist/assets/
+        // 3. Copy the entire assets/ and assets2/ folders into dist/
         const assetsSrc = path.resolve(__dirname, 'assets');
         const assetsDist = path.resolve(distDir, 'assets');
         if (fs.existsSync(assetsSrc)) {
           fs.cpSync(assetsSrc, assetsDist, { recursive: true });
+        }
+
+        const assets2Src = path.resolve(__dirname, 'assets2');
+        const assets2Dist = path.resolve(distDir, 'assets2');
+        if (fs.existsSync(assets2Src)) {
+          fs.cpSync(assets2Src, assets2Dist, { recursive: true });
         }
 
         // 4. Static subpage entry points for flawless routing on any CDN/host (Vercel/Netlify)
