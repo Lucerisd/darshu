@@ -8,7 +8,7 @@ export default defineConfig({
     open: false,
     host: true,
     watch: {
-      ignored: ['**/dist/**', '**/.git/**', '**/.vercel/**', '**/.netlify/**', '**/assets/**', '**/assets2/**', '**/node_modules/**']
+      ignored: ['**/dist/**', '**/.git/**', '**/.vercel/**', '**/.netlify/**', '**/assets/**', '**/assets2/**', '**/node_modules/**', '**/darshitagupta.in/**', '**/zainabkabira.com/**']
     }
   },
   preview: {
